@@ -1,0 +1,280 @@
+/* ============================================================
+   Features — Premium AI SaaS Feature Grid
+   Depends on: src/styles/variables.css
+   ============================================================ */
+
+.features {
+  position: relative;
+  padding-block: var(--space-24);
+  background-color: var(--color-bg-base);
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--space-8);
+}
+
+/* ---------- Section header ---------- */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto var(--space-16);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-5);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  color: var(--color-text-secondary);
+  background-color: rgba(34, 211, 168, 0.08);
+  border: 1px solid rgba(34, 211, 168, 0.3);
+  border-radius: var(--radius-full);
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-accent-500);
+  box-shadow: 0 0 8px var(--color-accent-500);
+}
+
+.title {
+  font-size: clamp(1.875rem, 3vw + 1rem, var(--fs-3xl));
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.gradientText {
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  font-size: var(--fs-md);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+}
+
+/* ---------- Card ---------- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-8) var(--space-6);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  cursor: default;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard);
+}
+
+/* Radial spotlight that appears on hover */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    280px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(59, 111, 242, 0.14),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-lg);
+  background-color: var(--color-bg-surface-alt);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Top accent bar that grows in on hover */
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary-500), var(--color-accent-500));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.card:hover::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Icon ---------- */
+.iconWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(59, 111, 242, 0.16), rgba(34, 211, 168, 0.1));
+  border: 1px solid rgba(59, 111, 242, 0.25);
+  color: var(--color-primary-300);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+.card:hover .iconWrap {
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 0 24px rgba(59, 111, 242, 0.3);
+  color: var(--color-accent-500);
+}
+
+.iconWrap svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- Text ---------- */
+.cardTitle {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+  line-height: var(--lh-snug);
+}
+
+.cardDescription {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+/* ---------- Footer link ---------- */
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-5);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--color-primary-400);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.card:hover .cardLink {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.cardLink svg {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.cardLink:hover svg {
+  transform: translateX(3px);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .features {
+    padding-block: var(--space-16);
+  }
+
+  .inner {
+    padding-inline: var(--space-5);
+  }
+
+  .header {
+    margin-bottom: var(--space-10);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .card {
+    padding: var(--space-6) var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--fs-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--fs-sm);
+  }
+
+  .iconWrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .iconWrap svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .iconWrap,
+  .cardLink,
+  .card::after,
+  .card::before {
+    transition: none;
+  }
+}
