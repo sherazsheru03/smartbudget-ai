@@ -3,15 +3,32 @@
    Depends on: variables.css, reset.css, typography.css
    ============================================================ */
 
+@import "./variables.css";
+@import "./reset.css";
+@import "./typography.css";
+
+
 /* ---------- Base surfaces ---------- */
+
 body {
   background-image:
-    radial-gradient(circle at 15% 0%, rgba(59, 111, 242, 0.08), transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(34, 211, 168, 0.06), transparent 40%);
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(59, 111, 242, 0.08),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(34, 211, 168, 0.06),
+      transparent 40%
+    );
+
   background-attachment: fixed;
 }
 
+
 /* ---------- Layout primitives ---------- */
+
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -70,44 +87,157 @@ body {
   gap: var(--space-2);
 }
 
+
 /* ---------- Flex / Grid utilities ---------- */
-.flex        { display: flex; }
-.inline-flex { display: inline-flex; }
-.flex-col    { flex-direction: column; }
-.items-center{ align-items: center; }
-.items-start { align-items: flex-start; }
-.items-end   { align-items: flex-end; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.justify-end { justify-content: flex-end; }
-.flex-wrap   { flex-wrap: wrap; }
-.flex-1      { flex: 1 1 0%; }
 
-.grid        { display: grid; }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.flex {
+  display: flex;
+}
 
-.gap-1 { gap: var(--space-1); }
-.gap-2 { gap: var(--space-2); }
-.gap-3 { gap: var(--space-3); }
-.gap-4 { gap: var(--space-4); }
-.gap-6 { gap: var(--space-6); }
-.gap-8 { gap: var(--space-8); }
+.inline-flex {
+  display: inline-flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.gap-1 {
+  gap: var(--space-1);
+}
+
+.gap-2 {
+  gap: var(--space-2);
+}
+
+.gap-3 {
+  gap: var(--space-3);
+}
+
+.gap-4 {
+  gap: var(--space-4);
+}
+
+.gap-6 {
+  gap: var(--space-6);
+}
+
+.gap-8 {
+  gap: var(--space-8);
+}
+
 
 /* ---------- Spacing utilities ---------- */
-.mt-1 { margin-top: var(--space-1); } .mt-2 { margin-top: var(--space-2); }
-.mt-4 { margin-top: var(--space-4); } .mt-6 { margin-top: var(--space-6); }
-.mt-8 { margin-top: var(--space-8); }
-.mb-1 { margin-bottom: var(--space-1); } .mb-2 { margin-bottom: var(--space-2); }
-.mb-4 { margin-bottom: var(--space-4); } .mb-6 { margin-bottom: var(--space-6); }
-.mb-8 { margin-bottom: var(--space-8); }
-.p-2 { padding: var(--space-2); } .p-4 { padding: var(--space-4); }
-.p-6 { padding: var(--space-6); } .p-8 { padding: var(--space-8); }
+
+.mt-1 {
+  margin-top: var(--space-1);
+}
+
+.mt-2 {
+  margin-top: var(--space-2);
+}
+
+.mt-4 {
+  margin-top: var(--space-4);
+}
+
+.mt-6 {
+  margin-top: var(--space-6);
+}
+
+.mt-8 {
+  margin-top: var(--space-8);
+}
+
+.mb-1 {
+  margin-bottom: var(--space-1);
+}
+
+.mb-2 {
+  margin-bottom: var(--space-2);
+}
+
+.mb-4 {
+  margin-bottom: var(--space-4);
+}
+
+.mb-6 {
+  margin-bottom: var(--space-6);
+}
+
+.mb-8 {
+  margin-bottom: var(--space-8);
+}
+
+.p-2 {
+  padding: var(--space-2);
+}
+
+.p-4 {
+  padding: var(--space-4);
+}
+
+.p-6 {
+  padding: var(--space-6);
+}
+
+.p-8 {
+  padding: var(--space-8);
+}
+
 
 /* ============================================================
    Buttons
    ============================================================ */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -138,20 +268,32 @@ body {
   box-shadow: var(--focus-ring);
 }
 
+
 /* Primary */
+
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-500),
+    var(--color-primary-600)
+  );
   color: #ffffff;
   box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-400), var(--color-primary-500));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-400),
+    var(--color-primary-500)
+  );
   box-shadow: var(--shadow-md), var(--shadow-glow-primary);
   transform: translateY(-1px);
 }
 
+
 /* Secondary */
+
 .btn-secondary {
   background-color: var(--color-bg-surface-alt);
   color: var(--color-text-primary);
@@ -163,7 +305,9 @@ body {
   border-color: var(--color-primary-500);
 }
 
+
 /* Ghost */
+
 .btn-ghost {
   background: transparent;
   color: var(--color-text-secondary);
@@ -174,9 +318,15 @@ body {
   color: var(--color-text-primary);
 }
 
+
 /* Danger */
+
 .btn-danger {
-  background: linear-gradient(135deg, var(--color-danger-500), var(--color-danger-600));
+  background: linear-gradient(
+    135deg,
+    var(--color-danger-500),
+    var(--color-danger-600)
+  );
   color: #ffffff;
 }
 
@@ -185,9 +335,15 @@ body {
   transform: translateY(-1px);
 }
 
+
 /* Success */
+
 .btn-success {
-  background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-500),
+    var(--color-accent-600)
+  );
   color: var(--color-text-inverse);
 }
 
@@ -196,7 +352,9 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+
 /* Outline */
+
 .btn-outline {
   background: transparent;
   border-color: var(--color-primary-500);
@@ -207,7 +365,9 @@ body {
   background-color: rgba(59, 111, 242, 0.1);
 }
 
+
 /* Sizes */
+
 .btn-sm {
   padding: var(--space-2) var(--space-3);
   font-size: var(--fs-xs);
@@ -228,9 +388,11 @@ body {
   width: 100%;
 }
 
+
 /* ============================================================
    Cards
    ============================================================ */
+
 .card {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
@@ -263,9 +425,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+
 /* ============================================================
    Forms
    ============================================================ */
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -289,7 +453,9 @@ body {
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-size: var(--fs-sm);
-  transition: var(--transition-colors), box-shadow var(--duration-fast) var(--ease-standard);
+  transition:
+    var(--transition-colors),
+    box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .form-input:hover,
@@ -319,9 +485,11 @@ body {
   color: var(--color-error);
 }
 
+
 /* ============================================================
    Badges & Tags
    ============================================================ */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -333,15 +501,36 @@ body {
   line-height: 1.4;
 }
 
-.badge-success { background-color: rgba(34, 211, 168, 0.15); color: var(--color-success); }
-.badge-danger  { background-color: rgba(240, 87, 107, 0.15); color: var(--color-error); }
-.badge-warning { background-color: rgba(245, 166, 35, 0.15); color: var(--color-warning); }
-.badge-info    { background-color: rgba(56, 189, 248, 0.15); color: var(--color-info); }
-.badge-neutral { background-color: var(--color-bg-surface-alt); color: var(--color-text-secondary); }
+.badge-success {
+  background-color: rgba(34, 211, 168, 0.15);
+  color: var(--color-success);
+}
+
+.badge-danger {
+  background-color: rgba(240, 87, 107, 0.15);
+  color: var(--color-error);
+}
+
+.badge-warning {
+  background-color: rgba(245, 166, 35, 0.15);
+  color: var(--color-warning);
+}
+
+.badge-info {
+  background-color: rgba(56, 189, 248, 0.15);
+  color: var(--color-info);
+}
+
+.badge-neutral {
+  background-color: var(--color-bg-surface-alt);
+  color: var(--color-text-secondary);
+}
+
 
 /* ============================================================
    Dividers, Skeletons, Misc
    ============================================================ */
+
 .divider {
   height: 1px;
   background-color: var(--color-border);
@@ -350,18 +539,25 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     var(--color-bg-surface-alt) 25%,
     var(--color-bg-hover) 37%,
-    var(--color-bg-surface-alt) 63%);
+    var(--color-bg-surface-alt) 63%
+  );
   background-size: 400% 100%;
   animation: skeleton-loading 1.4s ease infinite;
   border-radius: var(--radius-md);
 }
 
 @keyframes skeleton-loading {
-  0%   { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 .spinner {
@@ -374,22 +570,35 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+
 /* ---------- Scroll-in / fade utilities ---------- */
+
 .fade-in {
   animation: fadeIn var(--duration-slow) var(--ease-out) both;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+
 /* ============================================================
-   Scrollbar-less horizontal scroller (mobile chip rows, etc.)
+   Scrollbar-less horizontal scroller
    ============================================================ */
+
 .scroll-x {
   display: flex;
   gap: var(--space-3);
@@ -402,16 +611,23 @@ body {
   display: none;
 }
 
+
 /* ============================================================
    Responsive breakpoints
    ============================================================ */
+
 @media (max-width: 1024px) {
   .app-shell {
     grid-template-columns: var(--sidebar-width-collapsed) 1fr;
   }
 
-  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -420,7 +636,7 @@ body {
   }
 
   .app-sidebar {
-    display: none; /* replaced by a mobile drawer/nav component */
+    display: none;
   }
 
   .app-content {
@@ -454,9 +670,11 @@ body {
   }
 }
 
+
 /* ============================================================
-   Print (optional, safe default for statements/exports)
+   Print
    ============================================================ */
+
 @media print {
   body {
     background: #fff;
