@@ -9,6 +9,12 @@
  * numbers and will never throw, and never return NaN or Infinity.
  */
 
+const RISK_LEVEL = {
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+};
+
 const toSafeNumber = (value, fallback = 0) => {
   const numericValue = Number(value);
 
@@ -17,6 +23,31 @@ const toSafeNumber = (value, fallback = 0) => {
   }
 
   return numericValue;
+};
+
+/**
+ * Classifies risk level from the projected percentage using fixed thresholds:
+ *  - >= 100  -> HIGH
+ *  - >= 80   -> MEDIUM
+ *  - < 80    -> LOW
+ *
+ * No days-remaining weighting or additional scoring is applied, by design.
+ *
+ * @param {number} projectedPercentage
+ * @returns {"LOW"|"MEDIUM"|"HIGH"}
+ */
+const classifyRiskLevel = (projectedPercentage) => {
+  const safeProjectedPercentage = toSafeNumber(projectedPercentage, 0);
+
+  if (safeProjectedPercentage >= 100) {
+    return RISK_LEVEL.HIGH;
+  }
+
+  if (safeProjectedPercentage >= 80) {
+    return RISK_LEVEL.MEDIUM;
+  }
+
+  return RISK_LEVEL.LOW;
 };
 
 /**
@@ -31,7 +62,9 @@ const toSafeNumber = (value, fallback = 0) => {
  *   projectedTotal: number,
  *   projectedOverage: number,
  *   projectedPercentage: number,
- *   daysRemaining: number
+ *   daysRemaining: number,
+ *   recommendedDailySpend: number,
+ *   riskLevel: "LOW"|"MEDIUM"|"HIGH"
  * }}
  */
 const calculateBudgetProjection = (
@@ -58,12 +91,21 @@ const calculateBudgetProjection = (
   const projectedPercentage =
     safeBudgetAmount > 0 ? (projectedTotal / safeBudgetAmount) * 100 : 0;
 
+  const remainingAmount = safeBudgetAmount - safeActualSpending;
+
+  const recommendedDailySpend =
+    daysRemaining > 0 ? remainingAmount / daysRemaining : 0;
+
+  const riskLevel = classifyRiskLevel(projectedPercentage);
+
   return {
     dailyBurnRate,
     projectedTotal,
     projectedOverage,
     projectedPercentage,
     daysRemaining,
+    recommendedDailySpend,
+    riskLevel,
   };
 };
 

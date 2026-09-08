@@ -92,6 +92,28 @@ const getExpenseDateOnly = (dateValue) => {
 };
 
 
+const RISK_LEVEL_STYLE_MAP = {
+  HIGH: {
+    color: "#f0576b",
+    backgroundColor: "rgba(240, 87, 107, 0.12)",
+    borderColor: "#f0576b",
+    label: "HIGH RISK",
+  },
+  MEDIUM: {
+    color: "#f0b429",
+    backgroundColor: "rgba(240, 180, 41, 0.12)",
+    borderColor: "#f0b429",
+    label: "MEDIUM RISK",
+  },
+  LOW: {
+    color: "#22d3a8",
+    backgroundColor: "rgba(34, 211, 168, 0.12)",
+    borderColor: "#22d3a8",
+    label: "ON TRACK",
+  },
+};
+
+
 function Dashboard() {
   const navigate = useNavigate();
 
@@ -851,6 +873,54 @@ function Dashboard() {
             ? aiInsightError
             : aiInsight?.summary || "No insights available yet."}
         </p>
+
+
+        {!aiInsightLoading &&
+          !aiInsightError &&
+          Array.isArray(aiInsight?.insights) &&
+          aiInsight.insights.length > 0 && (
+            <div style={styles.aiInsightList}>
+              {aiInsight.insights.map((insight, index) => {
+                const riskStyle =
+                  RISK_LEVEL_STYLE_MAP[insight.riskLevel] ||
+                  RISK_LEVEL_STYLE_MAP.LOW;
+
+
+                return (
+                  <div
+                    key={insight.budgetId ?? `${insight.category}-${index}`}
+                    style={styles.aiInsightItem}
+                  >
+                    <div style={styles.aiInsightItemHeader}>
+                      <span style={styles.aiInsightCategory}>
+                        {insight.category}
+                      </span>
+
+
+                      <span
+                        style={{
+                          ...styles.riskBadge,
+                          color: riskStyle.color,
+                          backgroundColor: riskStyle.backgroundColor,
+                          borderColor: riskStyle.borderColor,
+                        }}
+                      >
+                        {riskStyle.label}
+                      </span>
+                    </div>
+
+
+                    <p style={styles.aiInsightMessage}>{insight.message}</p>
+
+
+                    <p style={styles.aiInsightRecommendation}>
+                      {insight.recommendation}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
       </section>
     </div>
   );
@@ -1309,6 +1379,66 @@ const styles = {
     fontSize: "1rem",
     marginTop: "8px",
     margin: 0,
+  },
+
+
+  aiInsightList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    marginTop: "18px",
+  },
+
+
+  aiInsightItem: {
+    backgroundColor: "#0f0f14",
+    border: "1px solid #2a2a35",
+    borderRadius: "10px",
+    padding: "14px 16px",
+  },
+
+
+  aiInsightItemHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+
+
+  aiInsightCategory: {
+    fontSize: "0.95rem",
+    fontWeight: 600,
+    color: "#ffffff",
+  },
+
+
+  riskBadge: {
+    padding: "4px 10px",
+    borderRadius: "999px",
+    border: "1px solid",
+    fontSize: "0.7rem",
+    fontWeight: 700,
+    letterSpacing: "0.04em",
+    whiteSpace: "nowrap",
+  },
+
+
+  aiInsightMessage: {
+    color: "#cfcfd8",
+    fontSize: "0.875rem",
+    marginTop: "8px",
+    margin: 0,
+  },
+
+
+  aiInsightRecommendation: {
+    color: "#818cf8",
+    fontSize: "0.875rem",
+    marginTop: "8px",
+    margin: 0,
+    fontWeight: 500,
   },
 };
 

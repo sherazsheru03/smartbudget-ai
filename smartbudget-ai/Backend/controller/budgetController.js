@@ -119,6 +119,69 @@ const getCurrentMonthDayInfo = ()=>{
 };
 
 
+const formatCurrencyForInsight = (value)=>{
+
+
+    const numericValue = Number(value);
+
+
+    const safeValue =
+        Number.isFinite(numericValue) ? numericValue : 0;
+
+
+    return `₹${safeValue.toLocaleString("en-IN",{
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+    })}`;
+
+
+};
+
+
+/**
+ * Builds the final recommendation text using ONLY backend-calculated
+ * numbers. Gemini's wording for this field is intentionally discarded and
+ * replaced here, because free-text generation cannot be trusted to copy a
+ * numeric value byte-for-byte into prose (Gemini has been observed silently
+ * recalculating/altering the daily-spend figure despite explicit prompt
+ * instructions not to). This guarantees the number shown to the user always
+ * matches budgetProjection.js exactly.
+ */
+const buildTrustedRecommendation = (budgetDataItem)=>{
+
+
+    const {
+        category,
+        remainingAmount,
+        recommendedDailySpend,
+        daysRemaining
+    } = budgetDataItem;
+
+
+    if(daysRemaining <= 0){
+
+
+        return `The budgeting period for ${category} has ended or has no days remaining.`;
+
+
+    }
+
+
+    if(remainingAmount <= 0){
+
+
+        return `You have no remaining budget for ${category}. Consider reviewing this category's spending for the rest of the month.`;
+
+
+    }
+
+
+    return `You have ${formatCurrencyForInsight(remainingAmount)} remaining, so try to keep ${category} spending around ${formatCurrencyForInsight(recommendedDailySpend)}/day for the rest of the month.`;
+
+
+};
+
+
 exports.createBudget = async(req,res)=>{
 
 
@@ -481,22 +544,56 @@ exports.getBudgetInsights = async(req,res)=>{
                 percentageUsed:budget.percentageUsed,
                 dailyBurnRate:projection.dailyBurnRate,
                 projectedTotal:projection.projectedTotal,
+                projectedPercentage:projection.projectedPercentage,
                 projectedOverage:projection.projectedOverage,
-                daysRemaining:projection.daysRemaining
+                daysRemaining:projection.daysRemaining,
+                recommendedDailySpend:projection.recommendedDailySpend,
+                riskLevel:projection.riskLevel
             };
 
 
         });
 
 
-        const { insights, summary } =
+        const aiResult =
             await generateBudgetInsights(budgetData);
+
+
+        const budgetDataById = new Map(
+            budgetData.map((item)=>[String(item.budgetId), item])
+        );
+
+
+        const trustedInsights = aiResult.insights.map((insight)=>{
+
+
+            const matchingBudgetData =
+                budgetDataById.get(String(insight.budgetId));
+
+
+            if(!matchingBudgetData){
+
+
+                return insight;
+
+
+            }
+
+
+            return {
+                ...insight,
+                riskLevel:matchingBudgetData.riskLevel,
+                recommendation:buildTrustedRecommendation(matchingBudgetData)
+            };
+
+
+        });
 
 
         res.status(200).json({
             message:"Budget insights fetched successfully",
-            insights,
-            summary
+            insights:trustedInsights,
+            summary:aiResult.summary
         });
 
 

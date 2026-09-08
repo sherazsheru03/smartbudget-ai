@@ -6,7 +6,7 @@
  *
  * This service:
  *  - does NOT access PostgreSQL, Budget.js, Expense.js, req, or res
- *  - does NOT calculate spending or projection numbers
+ *  - does NOT calculate spending, projection, risk, or recommendation numbers
  *  - is fully isolated: swap the provider here without touching any caller
  *
  * Required environment variables:
@@ -21,6 +21,8 @@ const REQUEST_TIMEOUT_MS = 30000;
 
 const MAX_RETRIES_AFTER_INITIAL_ATTEMPT = 2;
 const RETRY_BASE_DELAY_MS = 1000;
+
+const RISK_LEVELS = ["LOW", "MEDIUM", "HIGH"];
 
 class AIInsightServiceError extends Error {
   constructor(message, code) {
@@ -48,13 +50,24 @@ const INSIGHT_RESPONSE_SCHEMA = {
             type: "string",
             description: "The budget category this insight refers to.",
           },
+          riskLevel: {
+            type: "string",
+            enum: RISK_LEVELS,
+            description:
+              "Must be copied exactly from the riskLevel supplied in the input data for this budget. Never recalculated or changed.",
+          },
           message: {
             type: "string",
             description:
               "A concise, non-judgmental 1-2 sentence insight using only the supplied numbers.",
           },
+          recommendation: {
+            type: "string",
+            description:
+              "A concise, practical 1-2 sentence recommendation derived only from the supplied remainingAmount and recommendedDailySpend.",
+          },
         },
-        required: ["category", "message"],
+        required: ["category", "riskLevel", "message", "recommendation"],
       },
     },
     summary: {
@@ -75,8 +88,11 @@ const buildPrompt = (budgetData) => {
     percentageUsed: item.percentageUsed,
     dailyBurnRate: item.dailyBurnRate,
     projectedTotal: item.projectedTotal,
+    projectedPercentage: item.projectedPercentage,
     projectedOverage: item.projectedOverage,
     daysRemaining: item.daysRemaining,
+    recommendedDailySpend: item.recommendedDailySpend,
+    riskLevel: item.riskLevel,
   }));
 
   const instructions = [
@@ -85,14 +101,25 @@ const buildPrompt = (budgetData) => {
     "",
     "STRICT RULES:",
     "- Do NOT change, recalculate, reinterpret, or invent any numerical value.",
+    "- Do NOT recalculate or change the supplied riskLevel. Copy it exactly as given for each budget.",
+    "- Do NOT recalculate or change the supplied recommendedDailySpend. Use it only to phrase the recommendation text.",
     "- Use ONLY the numbers supplied in the input. Do not invent expenses, budgets, dates, percentages, or financial facts.",
     "- Do NOT give investment, lending, tax, or other high-stakes financial advice.",
     "- Keep all output informational and budgeting-focused only.",
     "- Use practical, non-judgmental language. Never shame or lecture the user.",
-    "- Clearly distinguish three states per budget: \"on track\", \"at risk\", and \"projected to exceed\", based on the supplied percentageUsed/projectedOverage/daysRemaining values.",
-    "- Keep each insight message concise (1-2 sentences).",
+    "- The riskLevel you return for each budget must exactly match the riskLevel supplied for that budget in the input (LOW, MEDIUM, or HIGH).",
+    "- Keep each insight message concise (1-2 sentences), describing current spending status and projected status.",
+    "- Keep each recommendation concise (1-2 sentences), giving a practical suggestion based only on remainingAmount and recommendedDailySpend.",
     "- Keep the overall summary concise (1-3 sentences).",
     "- For each item in the input array, preserve its budgetId exactly as given (including if it is missing/null) in your corresponding insight.",
+    "",
+    "You MUST respond with ONLY valid JSON, no markdown formatting, no code fences, matching exactly this shape:",
+    "{",
+    '  "insights": [',
+    '    { "budgetId": <same identifier as input>, "category": "<string>", "riskLevel": "<LOW|MEDIUM|HIGH, copied from input>", "message": "<string>", "recommendation": "<string>" }',
+    "  ],",
+    '  "summary": "<string>"',
+    "}",
     "",
     "Input budget data:",
     JSON.stringify(sanitizedPayload),
@@ -159,8 +186,12 @@ const validateInsightResponse = (parsedResponse) => {
       typeof insight === "object" &&
       typeof insight.category === "string" &&
       insight.category.trim() !== "" &&
+      typeof insight.riskLevel === "string" &&
+      RISK_LEVELS.includes(insight.riskLevel) &&
       typeof insight.message === "string" &&
-      insight.message.trim() !== ""
+      insight.message.trim() !== "" &&
+      typeof insight.recommendation === "string" &&
+      insight.recommendation.trim() !== ""
     );
   });
 
@@ -182,7 +213,9 @@ const validateInsightResponse = (parsedResponse) => {
     insights: parsedResponse.insights.map((insight) => ({
       budgetId: insight.budgetId,
       category: insight.category,
+      riskLevel: insight.riskLevel,
       message: insight.message,
+      recommendation: insight.recommendation,
     })),
     summary: parsedResponse.summary,
   };
@@ -318,8 +351,9 @@ const callGeminiInteractionsApi = async (prompt) => {
  * @param {Array<Object>} budgetData - Array of pre-calculated budget/projection figures.
  *   Each item may include: budgetId, category, budgetAmount, actualSpending,
  *   remainingAmount, percentageUsed, dailyBurnRate, projectedTotal,
- *   projectedOverage, daysRemaining.
- * @returns {Promise<{ insights: Array<{ budgetId: any, category: string, message: string }>, summary: string }>}
+ *   projectedPercentage, projectedOverage, daysRemaining,
+ *   recommendedDailySpend, riskLevel.
+ * @returns {Promise<{ insights: Array<{ budgetId: any, category: string, riskLevel: string, message: string, recommendation: string }>, summary: string }>}
  * @throws {AIInsightServiceError} on missing API key, network failure, timeout,
  *   invalid provider response, or malformed insight data.
  */
