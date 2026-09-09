@@ -4,6 +4,7 @@ import API from "../../services/api";
 import { getBudgetSpending, getBudgetInsights } from "../../services/budgetService";
 
 
+
 const DATE_RANGE_OPTIONS = [
   "All Time",
   "This Month",
@@ -12,12 +13,15 @@ const DATE_RANGE_OPTIONS = [
 ];
 
 
+
 const pad = (value) => String(value).padStart(2, "0");
+
 
 
 const toDateOnlyString = (year, month, day) => {
   return `${year}-${pad(month + 1)}-${pad(day)}`;
 };
+
 
 
 const getDateRangeBounds = (rangeLabel) => {
@@ -26,9 +30,11 @@ const getDateRangeBounds = (rangeLabel) => {
   }
 
 
+
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
+
 
 
   if (rangeLabel === "This Month") {
@@ -41,8 +47,10 @@ const getDateRangeBounds = (rangeLabel) => {
     );
 
 
+
     return { start, end };
   }
+
 
 
   if (rangeLabel === "Last Month") {
@@ -55,8 +63,10 @@ const getDateRangeBounds = (rangeLabel) => {
     const end = toDateOnlyString(currentYear, currentMonth, 1);
 
 
+
     return { start, end };
   }
+
 
 
   if (rangeLabel === "Last 3 Months") {
@@ -74,12 +84,15 @@ const getDateRangeBounds = (rangeLabel) => {
     );
 
 
+
     return { start, end };
   }
 
 
+
   return { start: null, end: null };
 };
+
 
 
 const getExpenseDateOnly = (dateValue) => {
@@ -88,8 +101,10 @@ const getExpenseDateOnly = (dateValue) => {
   }
 
 
+
   return String(dateValue).slice(0, 10);
 };
+
 
 
 const RISK_LEVEL_STYLE_MAP = {
@@ -114,8 +129,19 @@ const RISK_LEVEL_STYLE_MAP = {
 };
 
 
+
+const ALERT_LABEL_MAP = {
+  BUDGET_EXCEEDED: "BUDGET EXCEEDED",
+  BUDGET_NEAR_LIMIT: "NEAR LIMIT",
+  PROJECTED_OVER_BUDGET: "PROJECTED OVER BUDGET",
+  BUDGET_EXHAUSTED: "BUDGET EXHAUSTED",
+};
+
+
+
 function Dashboard() {
   const navigate = useNavigate();
+
 
 
   const [expenses, setExpenses] = useState([]);
@@ -125,9 +151,11 @@ function Dashboard() {
   const [deleteError, setDeleteError] = useState("");
 
 
+
   const [summary, setSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [summaryError, setSummaryError] = useState("");
+
 
 
   const [budgetOverview, setBudgetOverview] = useState([]);
@@ -135,13 +163,16 @@ function Dashboard() {
   const [budgetOverviewError, setBudgetOverviewError] = useState("");
 
 
+
   const [aiInsight, setAiInsight] = useState(null);
   const [aiInsightLoading, setAiInsightLoading] = useState(true);
   const [aiInsightError, setAiInsightError] = useState("");
 
 
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDateRange, setSelectedDateRange] = useState("All Time");
+
 
 
   const fetchExpenses = async () => {
@@ -149,14 +180,18 @@ function Dashboard() {
     setError("");
 
 
+
     try {
       const response = await API.get("/expenses");
+
 
 
       const data = response.data;
 
 
+
       let expenseList = [];
+
 
 
       if (Array.isArray(data)) {
@@ -168,11 +203,13 @@ function Dashboard() {
       }
 
 
+
       setExpenses(expenseList);
     } catch (err) {
       const message =
         err.response?.data?.message ||
         "Failed to load expenses. Please try again.";
+
 
 
       setError(message);
@@ -182,9 +219,11 @@ function Dashboard() {
   };
 
 
+
   const fetchSummary = async () => {
     setSummaryLoading(true);
     setSummaryError("");
+
 
 
     try {
@@ -196,6 +235,7 @@ function Dashboard() {
         "Failed to load monthly summary.";
 
 
+
       setSummaryError(message);
     } finally {
       setSummaryLoading(false);
@@ -203,14 +243,17 @@ function Dashboard() {
   };
 
 
+
   const fetchBudgetOverview = async () => {
     setBudgetOverviewLoading(true);
     setBudgetOverviewError("");
 
 
+
     try {
       const response = await getBudgetSpending();
       const data = response.data?.budgets;
+
 
 
       setBudgetOverview(Array.isArray(data) ? data : []);
@@ -220,6 +263,7 @@ function Dashboard() {
         "Failed to load budget overview. Please try again.";
 
 
+
       setBudgetOverviewError(message);
     } finally {
       setBudgetOverviewLoading(false);
@@ -227,9 +271,11 @@ function Dashboard() {
   };
 
 
+
   const fetchAIInsight = async () => {
     setAiInsightLoading(true);
     setAiInsightError("");
+
 
 
     try {
@@ -243,6 +289,7 @@ function Dashboard() {
   };
 
 
+
   useEffect(() => {
     fetchExpenses();
     fetchSummary();
@@ -251,10 +298,12 @@ function Dashboard() {
   }, []);
 
 
+
   const handleDelete = async (id) => {
     if (deletingId) {
       return;
     }
+
 
 
     const confirmed = window.confirm(
@@ -262,13 +311,16 @@ function Dashboard() {
     );
 
 
+
     if (!confirmed) {
       return;
     }
 
 
+
     setDeletingId(id);
     setDeleteError("");
+
 
 
     try {
@@ -281,6 +333,7 @@ function Dashboard() {
         "Failed to delete expense. Please try again.";
 
 
+
       setDeleteError(message);
     } finally {
       setDeletingId(null);
@@ -288,9 +341,11 @@ function Dashboard() {
   };
 
 
+
   const handleEdit = (expense) => {
     navigate(`/expenses/edit/${expense.id}`, { state: expense });
   };
+
 
 
   const handleCategorySelect = (category) => {
@@ -300,14 +355,17 @@ function Dashboard() {
   };
 
 
+
   const handleClearFilters = () => {
     setSelectedCategory("All");
     setSelectedDateRange("All Time");
   };
 
 
+
   const formatCurrency = (value) => {
     const number = Number(value) || 0;
+
 
 
     return `₹${number.toLocaleString("en-IN", {
@@ -316,13 +374,16 @@ function Dashboard() {
   };
 
 
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
+
 
 
     if (Number.isNaN(date.getTime())) {
       return "";
     }
+
 
 
     return date.toLocaleDateString("en-IN", {
@@ -333,13 +394,16 @@ function Dashboard() {
   };
 
 
+
   const totalSpending = expenses.reduce(
     (sum, expense) => sum + (parseFloat(expense.amount) || 0),
     0
   );
 
 
+
   const transactionCount = expenses.length;
+
 
 
   const categoryTotals = expenses.reduce((acc, expense) => {
@@ -347,11 +411,14 @@ function Dashboard() {
     const amount = parseFloat(expense.amount) || 0;
 
 
+
     acc[category] = (acc[category] || 0) + amount;
+
 
 
     return acc;
   }, {});
+
 
 
   const categoryEntries = Object.entries(categoryTotals).sort(
@@ -359,12 +426,15 @@ function Dashboard() {
   );
 
 
+
   const topCategory =
     categoryEntries.length > 0 ? categoryEntries[0][0] : null;
 
 
+
   const { start: rangeStart, end: rangeEnd } =
     getDateRangeBounds(selectedDateRange);
+
 
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -373,9 +443,11 @@ function Dashboard() {
       (expense.category || "Uncategorized") === selectedCategory;
 
 
+
     if (!matchesCategory) {
       return false;
     }
+
 
 
     if (rangeStart === null || rangeEnd === null) {
@@ -383,11 +455,14 @@ function Dashboard() {
     }
 
 
+
     const expenseDateOnly = getExpenseDateOnly(expense.date);
+
 
 
     return expenseDateOnly >= rangeStart && expenseDateOnly < rangeEnd;
   });
+
 
 
   const recentExpenses = [...filteredExpenses]
@@ -395,8 +470,10 @@ function Dashboard() {
     .slice(0, 5);
 
 
+
   const hasActiveFilters =
     selectedCategory !== "All" || selectedDateRange !== "All Time";
+
 
 
   const getBudgetProgressColor = (percentageUsed) => {
@@ -405,13 +482,16 @@ function Dashboard() {
     }
 
 
+
     if (percentageUsed >= 80) {
       return "#f0b429";
     }
 
 
+
     return "#6366f1";
   };
+
 
 
   if (loading) {
@@ -423,6 +503,7 @@ function Dashboard() {
   }
 
 
+
   if (error) {
     return (
       <div style={styles.page}>
@@ -430,6 +511,7 @@ function Dashboard() {
       </div>
     );
   }
+
 
 
   return (
@@ -444,6 +526,7 @@ function Dashboard() {
         </div>
 
 
+
         <div style={styles.headerActions}>
           <button
             type="button"
@@ -453,6 +536,7 @@ function Dashboard() {
             View Analytics
           </button>
 
+
           <button
             type="button"
             onClick={() => navigate("/budgets")}
@@ -460,6 +544,7 @@ function Dashboard() {
           >
             Budgets
           </button>
+
 
 
           <button
@@ -473,14 +558,17 @@ function Dashboard() {
       </header>
 
 
+
       {deleteError && (
         <div style={styles.deleteErrorBanner}>{deleteError}</div>
       )}
 
 
+
       {/* MONTHLY SUMMARY */}
       <section style={styles.summarySection}>
         <h2 style={styles.panelTitle}>Monthly Summary</h2>
+
 
 
         {summaryLoading ? (
@@ -497,6 +585,7 @@ function Dashboard() {
                 {formatCurrency(summary.currentMonthTotal)}
               </p>
             </div>
+
 
 
             <div style={styles.card}>
@@ -518,10 +607,12 @@ function Dashboard() {
             </div>
 
 
+
             <div style={styles.card}>
               <p style={styles.cardLabel}>Top Category</p>
               <p style={styles.cardValue}>{summary.topCategory || "—"}</p>
             </div>
+
 
 
             <div style={styles.card}>
@@ -535,6 +626,7 @@ function Dashboard() {
       </section>
 
 
+
       {/* SUMMARY CARDS */}
       <section style={styles.summaryGrid}>
         <div style={styles.card}>
@@ -543,10 +635,12 @@ function Dashboard() {
         </div>
 
 
+
         <div style={styles.card}>
           <p style={styles.cardLabel}>Transactions</p>
           <p style={styles.cardValue}>{transactionCount}</p>
         </div>
+
 
 
         <div style={styles.card}>
@@ -556,10 +650,12 @@ function Dashboard() {
       </section>
 
 
+
       {/* BUDGET OVERVIEW */}
       <section style={styles.summarySection}>
         <div style={styles.panelHeaderRow}>
           <h2 style={styles.panelTitle}>Budget Overview</h2>
+
 
 
           <button
@@ -570,6 +666,7 @@ function Dashboard() {
             Manage Budgets
           </button>
         </div>
+
 
 
         {budgetOverviewLoading ? (
@@ -592,6 +689,7 @@ function Dashboard() {
               const isOverBudget = budget.remainingAmount < 0;
 
 
+
               return (
                 <div key={budget.id} style={styles.card}>
                   <div style={styles.budgetCardHeader}>
@@ -600,10 +698,12 @@ function Dashboard() {
                   </div>
 
 
+
                   <p style={styles.cardValue}>
                     {formatCurrency(budget.actualSpending)} /{" "}
                     {formatCurrency(budget.budgetAmount)}
                   </p>
+
 
 
                   <div style={styles.barTrack}>
@@ -617,10 +717,12 @@ function Dashboard() {
                   </div>
 
 
+
                   <div style={styles.budgetCardFooter}>
                     <span style={{ color: progressColor, fontWeight: 600 }}>
                       {Math.round(budget.percentageUsed * 100) / 100}%
                     </span>
+
 
 
                     <span
@@ -647,15 +749,18 @@ function Dashboard() {
       </section>
 
 
+
       {transactionCount === 0 ? (
         <section style={styles.emptyState}>
           <p style={styles.emptyTitle}>No expenses yet</p>
+
 
 
           <p style={styles.emptyText}>
             Add your first expense to start seeing your financial overview
             here.
           </p>
+
 
 
           <button
@@ -690,6 +795,7 @@ function Dashboard() {
               </h2>
 
 
+
               {hasActiveFilters && (
                 <button
                   type="button"
@@ -702,9 +808,11 @@ function Dashboard() {
             </div>
 
 
+
             <div style={styles.dateRangePillRow}>
               {DATE_RANGE_OPTIONS.map((rangeLabel) => {
                 const isActive = selectedDateRange === rangeLabel;
+
 
 
                 return (
@@ -725,6 +833,7 @@ function Dashboard() {
             </div>
 
 
+
             {recentExpenses.length === 0 ? (
               <p style={styles.statusTextInline}>
                 No expenses found for the selected filters.
@@ -737,16 +846,19 @@ function Dashboard() {
                       <p style={styles.expenseTitle}>{expense.title}</p>
 
 
+
                       <p style={styles.expenseMeta}>
                         {expense.category} · {formatDate(expense.date)}
                       </p>
                     </div>
 
 
+
                     <div style={styles.expenseRight}>
                       <p style={styles.expenseAmount}>
                         {formatCurrency(expense.amount)}
                       </p>
+
 
 
                       <button
@@ -759,6 +871,7 @@ function Dashboard() {
                       >
                         ✎
                       </button>
+
 
 
                       <button
@@ -779,10 +892,12 @@ function Dashboard() {
           </section>
 
 
+
           {/* SPENDING OVERVIEW */}
           <section style={styles.panel}>
             <div style={styles.panelHeaderRow}>
               <h2 style={styles.panelTitle}>Spending Overview</h2>
+
 
 
               <button
@@ -800,13 +915,16 @@ function Dashboard() {
             </div>
 
 
+
             <div style={styles.categoryList}>
               {categoryEntries.map(([category, amount]) => {
                 const percentage =
                   totalSpending > 0 ? (amount / totalSpending) * 100 : 0;
 
 
+
                 const isSelected = selectedCategory === category;
+
 
 
                 return (
@@ -839,10 +957,12 @@ function Dashboard() {
                       </span>
 
 
+
                       <span style={styles.categoryAmount}>
                         {formatCurrency(amount)}
                       </span>
                     </div>
+
 
 
                     <div style={styles.barTrack}>
@@ -863,6 +983,7 @@ function Dashboard() {
       )}
 
 
+
       {/* AI INSIGHT CARD */}
       <section style={styles.insightCard}>
         <p style={styles.insightLabel}>AI Insight</p>
@@ -873,6 +994,7 @@ function Dashboard() {
             ? aiInsightError
             : aiInsight?.summary || "No insights available yet."}
         </p>
+
 
 
         {!aiInsightLoading &&
@@ -886,6 +1008,7 @@ function Dashboard() {
                   RISK_LEVEL_STYLE_MAP.LOW;
 
 
+
                 return (
                   <div
                     key={insight.budgetId ?? `${insight.category}-${index}`}
@@ -895,6 +1018,7 @@ function Dashboard() {
                       <span style={styles.aiInsightCategory}>
                         {insight.category}
                       </span>
+
 
 
                       <span
@@ -910,7 +1034,25 @@ function Dashboard() {
                     </div>
 
 
+
+                    {Array.isArray(insight.alerts) &&
+                      insight.alerts.length > 0 && (
+                        <div style={styles.alertBadgeList}>
+                          {insight.alerts.map((alertCode) => (
+                            <span
+                              key={alertCode}
+                              style={styles.alertBadge}
+                            >
+                              {ALERT_LABEL_MAP[alertCode] || alertCode}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+
+
                     <p style={styles.aiInsightMessage}>{insight.message}</p>
+
 
 
                     <p style={styles.aiInsightRecommendation}>
@@ -927,6 +1069,7 @@ function Dashboard() {
 }
 
 
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -937,6 +1080,7 @@ const styles = {
   },
 
 
+
   statusText: {
     color: "#9a9aa5",
     fontSize: "1rem",
@@ -945,10 +1089,12 @@ const styles = {
   },
 
 
+
   statusTextInline: {
     color: "#9a9aa5",
     fontSize: "0.9rem",
   },
+
 
 
   header: {
@@ -961,11 +1107,13 @@ const styles = {
   },
 
 
+
   headerTitle: {
     fontSize: "1.75rem",
     fontWeight: 700,
     margin: 0,
   },
+
 
 
   headerSubtitle: {
@@ -975,11 +1123,13 @@ const styles = {
   },
 
 
+
   headerActions: {
     display: "flex",
     gap: "12px",
     flexWrap: "wrap",
   },
+
 
 
   addExpenseButton: {
@@ -996,6 +1146,7 @@ const styles = {
   },
 
 
+
   analyticsButton: {
     padding: "12px 20px",
     backgroundColor: "transparent",
@@ -1009,6 +1160,7 @@ const styles = {
   },
 
 
+
   deleteErrorBanner: {
     backgroundColor: "rgba(240, 87, 107, 0.12)",
     border: "1px solid #f0576b",
@@ -1020,9 +1172,11 @@ const styles = {
   },
 
 
+
   summarySection: {
     marginBottom: "32px",
   },
+
 
 
   summaryGrid: {
@@ -1034,12 +1188,14 @@ const styles = {
   },
 
 
+
   budgetOverviewGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
     gap: "16px",
     marginTop: "16px",
   },
+
 
 
   budgetCardHeader: {
@@ -1050,11 +1206,13 @@ const styles = {
   },
 
 
+
   budgetCardMonth: {
     color: "#9a9aa5",
     fontSize: "0.75rem",
     margin: 0,
   },
+
 
 
   budgetCardFooter: {
@@ -1066,12 +1224,14 @@ const styles = {
   },
 
 
+
   card: {
     backgroundColor: "#1a1a22",
     border: "1px solid #2a2a35",
     borderRadius: "12px",
     padding: "20px",
   },
+
 
 
   cardLabel: {
@@ -1081,12 +1241,14 @@ const styles = {
   },
 
 
+
   cardValue: {
     fontSize: "1.5rem",
     fontWeight: 700,
     marginTop: "8px",
     margin: 0,
   },
+
 
 
   emptyState: {
@@ -1099,6 +1261,7 @@ const styles = {
   },
 
 
+
   emptyTitle: {
     fontSize: "1.25rem",
     fontWeight: 600,
@@ -1106,11 +1269,13 @@ const styles = {
   },
 
 
+
   emptyText: {
     color: "#9a9aa5",
     fontSize: "0.95rem",
     marginTop: "8px",
   },
+
 
 
   emptyStateButton: {
@@ -1126,6 +1291,7 @@ const styles = {
   },
 
 
+
   contentGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
@@ -1134,12 +1300,14 @@ const styles = {
   },
 
 
+
   panel: {
     backgroundColor: "#1a1a22",
     border: "1px solid #2a2a35",
     borderRadius: "12px",
     padding: "20px",
   },
+
 
 
   panelHeaderRow: {
@@ -1152,6 +1320,7 @@ const styles = {
   },
 
 
+
   panelTitle: {
     fontSize: "1.1rem",
     fontWeight: 600,
@@ -1159,10 +1328,12 @@ const styles = {
   },
 
 
+
   panelTitleFilter: {
     color: "#818cf8",
     fontWeight: 600,
   },
+
 
 
   clearFilterButton: {
@@ -1178,12 +1349,14 @@ const styles = {
   },
 
 
+
   dateRangePillRow: {
     display: "flex",
     flexWrap: "wrap",
     gap: "8px",
     marginBottom: "16px",
   },
+
 
 
   categoryPill: {
@@ -1199,6 +1372,7 @@ const styles = {
   },
 
 
+
   categoryPillActive: {
     color: "#818cf8",
     borderColor: "#6366f1",
@@ -1206,11 +1380,13 @@ const styles = {
   },
 
 
+
   expenseList: {
     display: "flex",
     flexDirection: "column",
     gap: "14px",
   },
+
 
 
   expenseRow: {
@@ -1223,11 +1399,13 @@ const styles = {
   },
 
 
+
   expenseTitle: {
     fontSize: "0.95rem",
     fontWeight: 500,
     margin: 0,
   },
+
 
 
   expenseMeta: {
@@ -1237,11 +1415,13 @@ const styles = {
   },
 
 
+
   expenseRight: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
   },
+
 
 
   expenseAmount: {
@@ -1250,6 +1430,7 @@ const styles = {
     margin: 0,
     whiteSpace: "nowrap",
   },
+
 
 
   editButton: {
@@ -1268,6 +1449,7 @@ const styles = {
   },
 
 
+
   deleteButton: {
     display: "flex",
     alignItems: "center",
@@ -1284,11 +1466,13 @@ const styles = {
   },
 
 
+
   categoryList: {
     display: "flex",
     flexDirection: "column",
     gap: "16px",
   },
+
 
 
   categoryRow: {
@@ -1303,10 +1487,12 @@ const styles = {
   },
 
 
+
   categoryRowSelected: {
     backgroundColor: "rgba(99, 102, 241, 0.1)",
     border: "1px solid #6366f1",
   },
+
 
 
   categoryHeader: {
@@ -1317,9 +1503,11 @@ const styles = {
   },
 
 
+
   categoryName: {
     color: "#cfcfd8",
   },
+
 
 
   categoryNameSelected: {
@@ -1328,11 +1516,13 @@ const styles = {
   },
 
 
+
   categoryAmount: {
     color: "#ffffff",
     fontWeight: 600,
     whiteSpace: "nowrap",
   },
+
 
 
   barTrack: {
@@ -1345,6 +1535,7 @@ const styles = {
   },
 
 
+
   barFill: {
     height: "100%",
     backgroundColor: "#6366f1",
@@ -1352,9 +1543,11 @@ const styles = {
   },
 
 
+
   barFillSelected: {
     backgroundColor: "#818cf8",
   },
+
 
 
   insightCard: {
@@ -1363,6 +1556,7 @@ const styles = {
     borderRadius: "12px",
     padding: "20px",
   },
+
 
 
   insightLabel: {
@@ -1375,11 +1569,13 @@ const styles = {
   },
 
 
+
   insightText: {
     fontSize: "1rem",
     marginTop: "8px",
     margin: 0,
   },
+
 
 
   aiInsightList: {
@@ -1390,12 +1586,14 @@ const styles = {
   },
 
 
+
   aiInsightItem: {
     backgroundColor: "#0f0f14",
     border: "1px solid #2a2a35",
     borderRadius: "10px",
     padding: "14px 16px",
   },
+
 
 
   aiInsightItemHeader: {
@@ -1407,11 +1605,13 @@ const styles = {
   },
 
 
+
   aiInsightCategory: {
     fontSize: "0.95rem",
     fontWeight: 600,
     color: "#ffffff",
   },
+
 
 
   riskBadge: {
@@ -1425,12 +1625,37 @@ const styles = {
   },
 
 
+
+  alertBadgeList: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+    marginTop: "10px",
+  },
+
+
+
+  alertBadge: {
+    padding: "3px 8px",
+    borderRadius: "999px",
+    border: "1px solid #f0b429",
+    backgroundColor: "rgba(240, 180, 41, 0.12)",
+    color: "#f0b429",
+    fontSize: "0.65rem",
+    fontWeight: 700,
+    letterSpacing: "0.04em",
+    whiteSpace: "nowrap",
+  },
+
+
+
   aiInsightMessage: {
     color: "#cfcfd8",
     fontSize: "0.875rem",
     marginTop: "8px",
     margin: 0,
   },
+
 
 
   aiInsightRecommendation: {
@@ -1441,6 +1666,7 @@ const styles = {
     fontWeight: 500,
   },
 };
+
 
 
 export default Dashboard;

@@ -1,9 +1,11 @@
 const Budget = require("../models/Budget");
 const { calculateBudgetProjection } = require("../utils/budgetProjection");
+const { getBudgetAlerts } = require("../utils/budgetAlerts");
 const {
     generateBudgetInsights,
     AIInsightServiceError
 } = require("../services/aiInsightService");
+
 
 
 const VALID_CATEGORIES = [
@@ -19,7 +21,9 @@ const VALID_CATEGORIES = [
 ];
 
 
+
 const isValidMonth = (month)=>{
+
 
 
     if(typeof month !== "string"){
@@ -27,13 +31,17 @@ const isValidMonth = (month)=>{
     }
 
 
+
     return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
+
 
 
 };
 
 
+
 const normalizeMonth = (month)=>{
+
 
 
     if(!isValidMonth(month)){
@@ -41,13 +49,17 @@ const normalizeMonth = (month)=>{
     }
 
 
+
     return `${month}-01`;
+
 
 
 };
 
 
+
 const validateBudgetInput = (category,amount,month)=>{
+
 
 
     if(
@@ -58,12 +70,15 @@ const validateBudgetInput = (category,amount,month)=>{
     }
 
 
+
     if(!VALID_CATEGORIES.includes(category)){
         return "Invalid category";
     }
 
 
+
     const numericAmount = Number(amount);
+
 
 
     if(
@@ -78,9 +93,11 @@ const validateBudgetInput = (category,amount,month)=>{
     }
 
 
+
     if(!month){
         return "Month is required";
     }
+
 
 
     if(!isValidMonth(month)){
@@ -88,19 +105,25 @@ const validateBudgetInput = (category,amount,month)=>{
     }
 
 
+
     return null;
+
 
 
 };
 
 
+
 const getCurrentMonthDayInfo = ()=>{
+
 
 
     const today = new Date();
 
 
+
     const daysElapsed = today.getDate();
+
 
 
     const daysInMonth = new Date(
@@ -110,23 +133,29 @@ const getCurrentMonthDayInfo = ()=>{
     ).getDate();
 
 
+
     return {
         daysElapsed,
         daysInMonth
     };
 
 
+
 };
+
 
 
 const formatCurrencyForInsight = (value)=>{
 
 
+
     const numericValue = Number(value);
+
 
 
     const safeValue =
         Number.isFinite(numericValue) ? numericValue : 0;
+
 
 
     return `₹${safeValue.toLocaleString("en-IN",{
@@ -135,7 +164,9 @@ const formatCurrencyForInsight = (value)=>{
     })}`;
 
 
+
 };
+
 
 
 /**
@@ -150,6 +181,7 @@ const formatCurrencyForInsight = (value)=>{
 const buildTrustedRecommendation = (budgetDataItem)=>{
 
 
+
     const {
         category,
         remainingAmount,
@@ -158,37 +190,49 @@ const buildTrustedRecommendation = (budgetDataItem)=>{
     } = budgetDataItem;
 
 
+
     if(daysRemaining <= 0){
+
 
 
         return `The budgeting period for ${category} has ended or has no days remaining.`;
 
 
+
     }
+
 
 
     if(remainingAmount <= 0){
 
 
+
         return `You have no remaining budget for ${category}. Consider reviewing this category's spending for the rest of the month.`;
+
 
 
     }
 
 
+
     return `You have ${formatCurrencyForInsight(remainingAmount)} remaining, so try to keep ${category} spending around ${formatCurrencyForInsight(recommendedDailySpend)}/day for the rest of the month.`;
+
 
 
 };
 
 
+
 exports.createBudget = async(req,res)=>{
+
 
 
     try{
 
 
+
         const user_id = req.user.id;
+
 
 
         const {
@@ -198,11 +242,13 @@ exports.createBudget = async(req,res)=>{
         } = req.body;
 
 
+
         const validationError = validateBudgetInput(
             category,
             amount,
             month
         );
+
 
 
         if(validationError){
@@ -212,7 +258,9 @@ exports.createBudget = async(req,res)=>{
         }
 
 
+
         const normalizedMonth = normalizeMonth(month);
+
 
 
         const budget = await Budget.create(
@@ -223,13 +271,16 @@ exports.createBudget = async(req,res)=>{
         );
 
 
+
         res.status(201).json({
             message:"Budget created successfully",
             budget
         });
 
 
+
     }catch(error){
+
 
 
         if(error.code === "23505"){
@@ -239,33 +290,43 @@ exports.createBudget = async(req,res)=>{
         }
 
 
+
         res.status(500).json({
             message:"Failed to create budget"
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.getBudgets = async(req,res)=>{
+
 
 
     try{
 
 
+
         const user_id = req.user.id;
+
 
 
         const budgets = await Budget.getAllByUser(user_id);
 
 
+
         res.status(200).json(budgets);
 
 
+
     }catch(error){
+
 
 
         res.status(500).json({
@@ -273,26 +334,33 @@ exports.getBudgets = async(req,res)=>{
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.getBudgetById = async(req,res)=>{
 
 
+
     try{
+
 
 
         const user_id = req.user.id;
         const { id } = req.params;
 
 
+
         const budget = await Budget.getById(
             id,
             user_id
         );
+
 
 
         if(!budget){
@@ -302,10 +370,13 @@ exports.getBudgetById = async(req,res)=>{
         }
 
 
+
         res.status(200).json(budget);
 
 
+
     }catch(error){
+
 
 
         res.status(500).json({
@@ -313,26 +384,33 @@ exports.getBudgetById = async(req,res)=>{
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.updateBudget = async(req,res)=>{
 
 
+
     try{
+
 
 
         const user_id = req.user.id;
         const { id } = req.params;
 
 
+
         const existingBudget = await Budget.getById(
             id,
             user_id
         );
+
 
 
         if(!existingBudget){
@@ -342,10 +420,12 @@ exports.updateBudget = async(req,res)=>{
         }
 
 
+
         const category =
             req.body.category !== undefined
                 ? req.body.category
                 : existingBudget.category;
+
 
 
         const amount =
@@ -354,22 +434,29 @@ exports.updateBudget = async(req,res)=>{
                 : existingBudget.amount;
 
 
+
         let month;
+
 
 
         if(req.body.month !== undefined){
 
 
+
             month = req.body.month;
+
 
 
         }else{
 
 
+
             month = String(existingBudget.month).slice(0,7);
 
 
+
         }
+
 
 
         const validationError = validateBudgetInput(
@@ -379,6 +466,7 @@ exports.updateBudget = async(req,res)=>{
         );
 
 
+
         if(validationError){
             return res.status(400).json({
                 message:validationError
@@ -386,7 +474,9 @@ exports.updateBudget = async(req,res)=>{
         }
 
 
+
         const normalizedMonth = normalizeMonth(month);
+
 
 
         const updatedBudget = await Budget.updateById(
@@ -398,11 +488,13 @@ exports.updateBudget = async(req,res)=>{
         );
 
 
+
         if(!updatedBudget){
             return res.status(404).json({
                 message:"Budget not found"
             });
         }
+
 
 
         res.status(200).json({
@@ -411,7 +503,9 @@ exports.updateBudget = async(req,res)=>{
         });
 
 
+
     }catch(error){
+
 
 
         if(error.code === "23505"){
@@ -421,31 +515,39 @@ exports.updateBudget = async(req,res)=>{
         }
 
 
+
         res.status(500).json({
             message:"Failed to update budget"
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.deleteBudget = async(req,res)=>{
 
 
+
     try{
+
 
 
         const user_id = req.user.id;
         const { id } = req.params;
 
 
+
         const deletedBudget = await Budget.deleteById(
             id,
             user_id
         );
+
 
 
         if(!deletedBudget){
@@ -455,13 +557,16 @@ exports.deleteBudget = async(req,res)=>{
         }
 
 
+
         res.status(200).json({
             message:"Budget deleted successfully",
             budget:deletedBudget
         });
 
 
+
     }catch(error){
+
 
 
         res.status(500).json({
@@ -469,23 +574,30 @@ exports.deleteBudget = async(req,res)=>{
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.getBudgetsWithSpending = async(req,res)=>{
+
 
 
     try{
 
 
+
         const user_id = req.user.id;
+
 
 
         const budgets =
             await Budget.getBudgetsWithSpending(user_id);
+
 
 
         res.status(200).json({
@@ -494,7 +606,9 @@ exports.getBudgetsWithSpending = async(req,res)=>{
         });
 
 
+
     }catch(error){
+
 
 
         res.status(500).json({
@@ -502,29 +616,38 @@ exports.getBudgetsWithSpending = async(req,res)=>{
         });
 
 
+
     }
+
 
 
 };
 
 
+
 exports.getBudgetInsights = async(req,res)=>{
+
 
 
     try{
 
 
+
         const user_id = req.user.id;
+
 
 
         const budgets =
             await Budget.getBudgetsWithSpending(user_id);
 
 
+
         const { daysElapsed, daysInMonth } = getCurrentMonthDayInfo();
 
 
+
         const budgetData = budgets.map((budget)=>{
+
 
 
             const projection = calculateBudgetProjection(
@@ -533,6 +656,15 @@ exports.getBudgetInsights = async(req,res)=>{
                 daysElapsed,
                 daysInMonth
             );
+
+
+
+            const alerts = getBudgetAlerts({
+                percentageUsed:budget.percentageUsed,
+                projectedPercentage:projection.projectedPercentage,
+                remainingAmount:budget.remainingAmount
+            });
+
 
 
             return {
@@ -548,15 +680,19 @@ exports.getBudgetInsights = async(req,res)=>{
                 projectedOverage:projection.projectedOverage,
                 daysRemaining:projection.daysRemaining,
                 recommendedDailySpend:projection.recommendedDailySpend,
-                riskLevel:projection.riskLevel
+                riskLevel:projection.riskLevel,
+                alerts
             };
+
 
 
         });
 
 
+
         const aiResult =
             await generateBudgetInsights(budgetData);
+
 
 
         const budgetDataById = new Map(
@@ -564,30 +700,39 @@ exports.getBudgetInsights = async(req,res)=>{
         );
 
 
+
         const trustedInsights = aiResult.insights.map((insight)=>{
+
 
 
             const matchingBudgetData =
                 budgetDataById.get(String(insight.budgetId));
 
 
+
             if(!matchingBudgetData){
+
 
 
                 return insight;
 
 
+
             }
+
 
 
             return {
                 ...insight,
                 riskLevel:matchingBudgetData.riskLevel,
-                recommendation:buildTrustedRecommendation(matchingBudgetData)
+                recommendation:buildTrustedRecommendation(matchingBudgetData),
+                alerts:matchingBudgetData.alerts
             };
 
 
+
         });
+
 
 
         res.status(200).json({
@@ -597,10 +742,13 @@ exports.getBudgetInsights = async(req,res)=>{
         });
 
 
+
     }catch(error){
 
 
+
         if(error instanceof AIInsightServiceError){
+
 
 
             return res.status(502).json({
@@ -609,7 +757,9 @@ exports.getBudgetInsights = async(req,res)=>{
             });
 
 
+
         }
+
 
 
         res.status(500).json({
@@ -617,7 +767,9 @@ exports.getBudgetInsights = async(req,res)=>{
         });
 
 
+
     }
+
 
 
 };
