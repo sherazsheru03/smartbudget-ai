@@ -1,4 +1,18 @@
 const Expense = require("../models/Expense");
+const { evaluateAndPersistBudgetNotifications } = require("../services/budgetNotificationService");
+
+const getNotificationMonth = (originalDateValue,fallbackDateValue)=>{
+
+    if(
+        typeof originalDateValue === "string" &&
+        /^\d{4}-\d{2}-\d{2}/.test(originalDateValue)
+    ){
+        return originalDateValue.slice(0,7);
+    }
+
+    return String(fallbackDateValue).slice(0,7);
+
+};
 
 exports.addExpense = async(req,res)=>{
 
@@ -20,6 +34,23 @@ exports.addExpense = async(req,res)=>{
             category,
             date
         );
+
+        try{
+
+            await evaluateAndPersistBudgetNotifications(
+                req.user.id,
+                expense.category,
+                getNotificationMonth(date,expense.date)
+            );
+
+        }catch(notificationError){
+
+            console.error(
+                "Failed to evaluate budget notifications after adding expense:",
+                notificationError
+            );
+
+        }
 
         res.status(201).json({
             message:"Expense added successfully",
@@ -112,6 +143,23 @@ exports.updateExpense = async(req,res)=>{
             return res.status(404).json({
                 message:"Expense not found"
             });
+        }
+
+        try{
+
+            await evaluateAndPersistBudgetNotifications(
+                req.user.id,
+                updatedExpense.category,
+                getNotificationMonth(date,updatedExpense.date)
+            );
+
+        }catch(notificationError){
+
+            console.error(
+                "Failed to evaluate budget notifications after updating expense:",
+                notificationError
+            );
+
         }
 
         res.status(200).json({
