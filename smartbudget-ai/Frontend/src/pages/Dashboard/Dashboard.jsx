@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import { getBudgetSpending, getBudgetInsights } from "../../services/budgetService";
+import NotificationCenter from "../../components/Notifications/NotificationCenter";
 
 
 
@@ -746,6 +747,13 @@ function Dashboard() {
             })}
           </div>
         )}
+      </section>
+
+
+
+      {/* NOTIFICATIONS */}
+      <section style={styles.summarySection}>
+        <NotificationCenter />
       </section>
 
 
