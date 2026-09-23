@@ -722,12 +722,23 @@ exports.getBudgetInsights = async(req,res)=>{
 
 
 
-            return {
-                ...insight,
-                riskLevel:matchingBudgetData.riskLevel,
-                recommendation:buildTrustedRecommendation(matchingBudgetData),
-                alerts:matchingBudgetData.alerts
-            };
+           return {
+    ...insight,
+    budgetId:matchingBudgetData.budgetId,
+    budgetAmount:matchingBudgetData.budgetAmount,
+    actualSpending:matchingBudgetData.actualSpending,
+    remainingAmount:matchingBudgetData.remainingAmount,
+    percentageUsed:matchingBudgetData.percentageUsed,
+    dailyBurnRate:matchingBudgetData.dailyBurnRate,
+    projectedTotal:matchingBudgetData.projectedTotal,
+    projectedPercentage:matchingBudgetData.projectedPercentage,
+    projectedOverage:matchingBudgetData.projectedOverage,
+    daysRemaining:matchingBudgetData.daysRemaining,
+    recommendedDailySpend:matchingBudgetData.recommendedDailySpend,
+    riskLevel:matchingBudgetData.riskLevel,
+    recommendation:buildTrustedRecommendation(matchingBudgetData),
+    alerts:matchingBudgetData.alerts
+};
 
 
 

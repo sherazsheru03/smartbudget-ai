@@ -16,7 +16,7 @@
 
 const GEMINI_INTERACTIONS_ENDPOINT =
   "https://generativelanguage.googleapis.com/v1beta/interactions";
-const DEFAULT_AI_MODEL = "gemini-3.7-flash";
+const DEFAULT_AI_MODEL = "gemini-3.6-flash";
 const REQUEST_TIMEOUT_MS = 30000;
 
 const MAX_RETRIES_AFTER_INITIAL_ATTEMPT = 2;
