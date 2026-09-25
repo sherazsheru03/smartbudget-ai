@@ -153,6 +153,8 @@ const Expense = {
             SELECT category, SUM(amount) AS total
             FROM expenses
             WHERE user_id=$1
+              AND date >= date_trunc('month', CURRENT_DATE - INTERVAL '5 months')
+              AND date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
             GROUP BY category
             ORDER BY total DESC
             `,
@@ -170,6 +172,8 @@ const Expense = {
             SELECT id, title, amount, category, date
             FROM expenses
             WHERE user_id=$1
+              AND date >= date_trunc('month', CURRENT_DATE - INTERVAL '5 months')
+              AND date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
             ORDER BY amount DESC
             LIMIT 1
             `,
@@ -187,6 +191,8 @@ const Expense = {
             SELECT COUNT(*) AS total_transactions
             FROM expenses
             WHERE user_id=$1
+              AND date >= date_trunc('month', CURRENT_DATE - INTERVAL '5 months')
+              AND date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
             `,
             [user_id]
         );
