@@ -104,6 +104,7 @@ const buildPrompt = (budgetData) => {
     "- Do NOT recalculate or change the supplied riskLevel. Copy it exactly as given for each budget.",
     "- Do NOT recalculate or change the supplied recommendedDailySpend. Use it only to phrase the recommendation text.",
     "- Use ONLY the numbers supplied in the input. Do not invent expenses, budgets, dates, percentages, or financial facts.",
+    "- All monetary values are in Indian Rupees. Always use the ₹ symbol (e.g. ₹500), never $ or any other currency symbol or code.",
     "- Do NOT give investment, lending, tax, or other high-stakes financial advice.",
     "- Keep all output informational and budgeting-focused only.",
     "- Use practical, non-judgmental language. Never shame or lecture the user.",
