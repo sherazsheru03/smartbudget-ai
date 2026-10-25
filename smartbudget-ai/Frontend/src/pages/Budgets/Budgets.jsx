@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   getBudgetSpending,
@@ -33,6 +34,16 @@ const formatCurrency = (value) => {
   return `₹${number.toLocaleString("en-IN", {
     maximumFractionDigits: 0,
   })}`;
+};
+
+const formatPercentage = (value) => {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "0%";
+  }
+
+  return `${Number(number.toFixed(2))}%`;
 };
 
 const emptyForm = {
@@ -503,7 +514,7 @@ function Budgets() {
                     className={styles.percentageLabel}
                     style={{ color: progressColor[state] }}
                   >
-                    {budget.percentageUsed}%
+                    {formatPercentage(budget.percentageUsed)}
                   </span>
 
                   <span
