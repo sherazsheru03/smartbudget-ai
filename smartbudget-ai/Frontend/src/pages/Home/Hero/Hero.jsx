@@ -1,23 +1,50 @@
+
+import { useNavigate } from "react-router-dom";
 import styles from "./Hero.module.css";
 
 function ArrowIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="5" y1="12" x2="19" y2="12" strokeLinecap="round" />
-      <polyline points="12 5 19 12 12 19" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <line
+        x1="5"
+        y1="12"
+        x2="19"
+        y2="12"
+        strokeLinecap="round"
+      />
+      <polyline
+        points="12 5 19 12 12 19"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function PlayIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polygon points="6 4 20 12 6 20 6 4" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <polygon
+        points="6 4 20 12 6 20 6 4"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className={styles.hero}>
       <div className={styles.bgGradient} />
@@ -34,7 +61,9 @@ export default function Hero() {
 
           <h1 className={styles.heading}>
             Take control of your money with{" "}
-            <span className={styles.gradientText}>AI that understands you</span>
+            <span className={styles.gradientText}>
+              AI that understands you
+            </span>
           </h1>
 
           <p className={styles.description}>
@@ -44,14 +73,22 @@ export default function Hero() {
           </p>
 
           <div className={styles.ctaRow}>
-            <button type="button" className={styles.ctaPrimary}>
+            {/* Get Started navigates to the login page */}
+            <button
+              type="button"
+              className={styles.ctaPrimary}
+              onClick={() => navigate("/login")}
+            >
               <span>
                 Get Started Free
                 <ArrowIcon />
               </span>
             </button>
 
-            <button type="button" className={styles.ctaSecondary}>
+            <button
+              type="button"
+              className={styles.ctaSecondary}
+            >
               <PlayIcon />
               Watch Demo
             </button>
@@ -64,13 +101,15 @@ export default function Hero() {
               <span className={styles.avatar} />
               <span className={styles.avatar} />
             </div>
+
             <p className={styles.trustText}>
-              Trusted by <strong>12,000+</strong> people managing their money smarter
+              Trusted by <strong>12,000+</strong> people managing their money
+              smarter
             </p>
           </div>
         </div>
 
-        {/* Right illustration placeholder */}
+        {/* Right illustration */}
         <div className={styles.illustrationWrap}>
           <div className={styles.illustrationGlow} />
 
@@ -91,12 +130,16 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className={`${styles.floatingChip} ${styles.chipTop}`}>
+          <div
+            className={`${styles.floatingChip} ${styles.chipTop}`}
+          >
             <span className={styles.chipIcon}>↑</span>
             Savings up 24%
           </div>
 
-          <div className={`${styles.floatingChip} ${styles.chipBottom}`}>
+          <div
+            className={`${styles.floatingChip} ${styles.chipBottom}`}
+          >
             <span className={styles.chipIcon}>AI</span>
             Smart insights ready
           </div>
